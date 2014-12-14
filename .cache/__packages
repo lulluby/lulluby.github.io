@@ -1,0 +1,9 @@
+base
+randomForest
+shiny
+devtools
+shinyapps
+knitr
+slidify
+bitops
+RCurl

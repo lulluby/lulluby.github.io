@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title></title>
+  <title>Slidify presentation on shiny app</title>
   <meta charset="utf-8">
-  <meta name="description" content="">
-  <meta name="author" content="">
+  <meta name="description" content="Slidify presentation on shiny app">
+  <meta name="author" content="Olga Ralovets">
   <meta name="generator" content="slidify" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -32,9 +32,9 @@
     <!-- LOGO SLIDE -->
         <slide class="title-slide segue nobackground">
   <hgroup class="auto-fadein">
-    <h1></h1>
+    <h1>Slidify presentation on shiny app</h1>
     <h2></h2>
-    <p><br/></p>
+    <p>Olga Ralovets<br/>Software engineer</p>
   </hgroup>
   <article></article>  
 </slide>
@@ -43,14 +43,75 @@
     <!-- SLIDES -->
     <slide class="" id="slide-1" style="background:;">
   <hgroup>
-    <h2>Read-And-Delete</h2>
+    <h2>Data</h2>
   </hgroup>
   <article data-timings="">
-    <ol>
-<li>Edit YAML front matter</li>
-<li>Write using R Markdown</li>
-<li>Use an empty line followed by three dashes to separate slides!</li>
-</ol>
+    <p>Here there is a mtcars dataset, containing 11 variables, using which we want to build the prediction model predicting mpg based on all other variables</p>
+
+<pre><code class="r">data(mtcars)
+</code></pre>
+
+<h2>Prediction model</h2>
+
+<p>Here is how we build the model and how to get the prediction mpg value for car charachterictic vales in R</p>
+
+<pre><code class="r">mc &lt;- randomForest(mpg ~ ., data = mtcars, importance=TRUE)
+predict(mc, data.frame(cyl=6, wt=2.62, disp=160, hp=110, drat=3.9,
+     qsec=16.46, vs=0, am=1, gear=4, carb=4))
+</code></pre>
+
+<pre><code>##        1 
+## 20.72181
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Server application code</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Here is a server code using the same model to predict mpg based on values input by user</p>
+
+<pre><code class="r">shinyServer(function(input, output) {
+        res &lt;- reactive({mc &lt;- randomForest(mpg ~ ., data = mtcars, importance=TRUE); 
+                         predict(mc, data.frame(cyl=as.numeric(input$cyl), wt=as.numeric(input$wt), 
+                             disp=as.numeric(input$disp), hp=as.numeric(input$hp),
+                             drat=as.numeric(input$drat), qsec=as.numeric(input$qsec),
+                             vs=as.numeric(input$vs), am=as.numeric(input$am),
+                             gear=as.numeric(input$gear), carb=as.numeric(input$carb)))})
+        output$result &lt;- renderText({res() })     })
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Client code</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Here is client code describing UI part of the app and passing input values to server function and displaying the result to user</p>
+
+<pre><code class="r">shinyUI(pageWithSidebar(headerPanel(&quot;MPG prediction based on the car&#39;s charachteristics&quot;),
+    sidebarPanel(numericInput(&quot;cyl&quot;, &quot;Number of cylinders&quot;, 4, min=1, max=32, step=1),
+        numericInput(&quot;disp&quot;, &quot;Displacement (cu.in.)&quot;, 70, min=1, step=0.1),
+        numericInput(&quot;hp&quot;, &quot;Gross horsepower&quot;, 100, min=10, step=1),
+        numericInput(&quot;drat&quot;, &quot;Rear axle ratio&quot;, 4, min=1, max=10, step=0.01),
+        numericInput(&quot;wt&quot;, &quot;Weight (lb/1000)&quot;, 3, min=1, max=10, step=0.001),
+        numericInput(&quot;qsec&quot;, &quot;1/4 mile time&quot;, 15, min=10, max=50, step=0.01),
+        selectInput(&quot;vs&quot;, &quot;V/S&quot;, choices = list(&quot;v-engine&quot; = &quot;0&quot;, &quot;s-engine&quot; = &quot;1&quot;)),
+        selectInput(&quot;am&quot;, &quot;Gross horsepower&quot;, choices = list(&quot;automatic&quot; = &quot;0&quot;, &quot;manual&quot; = &quot;1&quot;)),
+        numericInput(&quot;gear&quot;, &quot;Number of forward gears&quot;, 3, min=1, max = 10, step=1),
+        numericInput(&quot;carb&quot;, &quot;Number of carburetors&quot;, 2, min=1, max=10, step=1)
+    ),
+    mainPanel(h5(&quot;Please, input your car charachteristics in the panel in the left side of the screen. Default values and predicted mpg for them are provided. Please note, that predicted value is being changed every time you making changes to any of charachteristicts.&quot;),
+        h5(&quot;Miles per gallon for given car:&quot;),
+        textOutput(&#39;result&#39;))))
+</code></pre>
 
   </article>
   <!-- Presenter Notes -->
@@ -58,10 +119,10 @@
 
 <slide class="class" id="id" style="background:;">
   <hgroup>
-    <h2>Slide 2</h2>
+    <h2>App user interface</h2>
   </hgroup>
   <article data-timings="">
-    <p>slide2</p>
+    <p><img src="sc.png" alt="Interface"></p>
 
   </article>
   <!-- Presenter Notes -->
@@ -73,14 +134,26 @@
     <ul>
       <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=1 title='Read-And-Delete'>
+        data-slide=1 title='Data'>
          1
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='Slide 2'>
+        data-slide=2 title='Server application code'>
          2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Client code'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='App user interface'>
+         4
       </a>
     </li>
   </ul>
